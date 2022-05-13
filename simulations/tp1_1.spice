@@ -1,0 +1,79 @@
+** sch_path: /home/designer/icdesign/sch//tp2/tp1_1.sch
+**.subckt tp1_1
+XM1 VOUT net1 GND GND sky130_fd_pr__nfet_01v8 L=0.15 W='w' nf=1 ad='int((nf+1)/2) * W/nf * 0.29' as='int((nf+2)/2) * W/nf * 0.29'
++ pd='2*int((nf+1)/2) * (W/nf + 0.29)' ps='2*int((nf+2)/2) * (W/nf + 0.29)' nrd='0.29 / W' nrs='0.29 / W'
++ sa=0 sb=0 sd=0 mult=1 m=1
+VGS net1 GND DC{vgs}
+VDD net2 GND DC{vdd}
+XM2 VOUT net1 net2 net2 sky130_fd_pr__pfet_01v8 L=0.15 W='w' nf=1 ad='int((nf+1)/2) * W/nf * 0.29' as='int((nf+2)/2) * W/nf * 0.29'
++ pd='2*int((nf+1)/2) * (W/nf + 0.29)' ps='2*int((nf+2)/2) * (W/nf + 0.29)' nrd='0.29 / W' nrs='0.29 / W'
++ sa=0 sb=0 sd=0 mult=1 m=1
+**** begin user architecture code
+
+
+
+* Parameters
+.param vdd = 1.8
+.param vgs = 0.9
+.param w=0.45
+.options TEMP = -20
+
+
+
+* Models
+.lib ~/skywater/skywater-pdk/libraries/sky130_fd_pr_ngspice/latest/models/corners/sky130.lib TT
+
+* Data to save
+.save all  @M.XM1.msky130_fd_pr__nfet_01v8[id]  @M.XM1.msky130_fd_pr__nfet_01v8[value]  @M.XM1.msky130_fd_pr__nfet_01v8[gm]  @M.XM1.msky130_fd_pr__nfet_01v8[vth]  @M.XM1.msky130_fd_pr__nfet_01v8[vds]  @M.XM1.msky130_fd_pr__nfet_01v8[vdsat]  @M.XM1.msky130_fd_pr__nfet_01v8[vgs]  @M.XM2.msky130_fd_pr__pfet_01v8[id]  @M.XM2.msky130_fd_pr__pfet_01v8[gm]  @M.XM2.msky130_fd_pr__pfet_01v8[vth]  @M.XM2.msky130_fd_pr__pfet_01v8[vsd]  @M.XM2.msky130_fd_pr__pfet_01v8[vdsat]  @M.XM2.msky130_fd_pr__pfet_01v8[vsg]
+
+* Simulation
+.control
+
+  let i = 0.75
+  let n = 1.0
+
+  while i <= n
+   alter w = i
+   reset
+   dc VGS 0 2.3 0.01dc VGS 0.0 2.3 0.01
+   let i=i+0.1
+  end
+
+  alterparam w = 0.45
+  reset
+  dc VGS 0 2.3 0.01
+
+  alterparam w = 0.65
+  reset
+  dc VGS 0.0 2.3 0.01
+  wrdata ~/icdesign/sch/tp2/dc1.txt v(VOUT)
+
+  alterparam w = 0.75
+  reset
+  dc VGS 0.0 2.3 0.01
+  wrdata ~/icdesign/sch/tp2/dc2.txt v(VOUT)
+
+  dc VGS 0 1.8 0.3
+  setplot dc6
+  plot @M.XM1.msky130_fd_pr__nfet_01v8[vds] ylabel Cgg xlabel Vgs
+  set filetype = ascii
+  write tp1_1_dc3.raw
+
+  reset
+  unset filetype
+  op
+  save all
+  set filetype = ascii
+  unset filetype
+  write tp1_1.raw
+
+
+.endc
+
+.end
+
+
+**** end user architecture code
+**.ends
+.GLOBAL GND
+.end
