@@ -110,15 +110,14 @@ value="
 
   alterparam w = 0.65
   reset
-  dc VGS 0.0 2.3 0.01   
+  dc VGS 0.0 2.3 0.01
+  wrdata ~/icdesign/sch/tp2/dc1.txt v(VOUT)
   
   alterparam w = 0.75
   reset
   dc VGS 0.0 2.3 0.01  
-	
-  plot @M.XM1.msky130_fd_pr__nfet_01v8[vds] 
-  set filetype = ascii
-  write tp1_1_dc1.raw  
+  wrdata ~/icdesign/sch/tp2/dc2.txt v(VOUT)
+  
 
 .endc
 
